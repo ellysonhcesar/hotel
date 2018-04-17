@@ -32,7 +32,7 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Override
     public List<Checkin> findPersonInHotel() {
-        return calculatePrice(dao.findByExitDateGreaterThanEqual(LocalDateTime.now()));
+        return calculatePrice(dao.listPersonInHotel(LocalDateTime.now()));
     }
 
     @Override
