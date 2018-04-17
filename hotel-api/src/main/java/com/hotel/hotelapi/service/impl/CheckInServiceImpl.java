@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -77,8 +76,8 @@ public class CheckInServiceImpl implements CheckInService {
     }
 
     private void calculatePriceOfDay(Checkin checkin, LocalDateTime day) {
-        if(day.getDayOfWeek().getValue() == Calendar.SATURDAY
-                || day.getDayOfWeek().getValue() == Calendar.SUNDAY){
+        if(day.getDayOfWeek().getValue() == DayOfWeek.SATURDAY.getValue()
+                || day.getDayOfWeek().getValue() == DayOfWeek.SUNDAY.getValue()){
 
 
             if(checkin.getTotalPrice() == null){
