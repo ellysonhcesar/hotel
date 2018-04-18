@@ -1,0 +1,6 @@
+{
+    "daily": 120,
+    "weekend": 150,
+    "car": 15,
+    "car_weekend": 20
+}
