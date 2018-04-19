@@ -26,14 +26,6 @@
 </head>
 
 <body ng-controller="my-controller as vm">
-  <!--[if IE]>
-      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-
-
-
-
 
 
   <nav class="nav navbar navbar-default navbar-desafio">
@@ -50,10 +42,80 @@
         </div>
         <div class="row form-group">
           <div class="col-lg-3 col-md-3 col-xl-12 col-sm-12">
-            <button class="form-control btn-sm btn-primary" ng-click="vm.addNew()">Incluir pessoa</button>
+            <button class="form-control btn-sm btn-primary" ng-hide="vm.isInserting" ng-click="vm.addNew()">Incluir pessoa</button>
+            <button class="form-control btn-sm btn-primary" ng-hide="!vm.isInserting" ng-click="vm.addNew()">CheckIn</button>
           </div>
         </div>
-        <div ng-show="vm.isInserting" class="row form-group">
+        <div ng-show="vm.isInserting">
+          <div  class="row form-group">
+            <div class="col-lg-12 col-md-12 col-xl-12 col-sm-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading bg-primary">
+                  <h4>Nova Pessoa</h4>
+                </div>
+                <div class="panel-body">
+                  <form ng-submit="vm.saveNewPerson()">
+                    <div class="row form-group">
+                      <div class="col-lg-4 col-md-4 col-xs-12 col-sm-12">
+                        <label for="name"> Nome </label>
+                        <input id="name" class="form-control" type="text" name="name" ng-model="vm.newPerson.name" >
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-xs-12 col-sm-12">
+                        <label for="document"> Documento </label>
+                        <input id="document" class="form-control" type="text" name="document" ng-model="vm.newPerson.document" >
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-xs-12 col-sm-12">
+                        <label for="fone"> Telefone </label>
+                        <input id="fone" class="form-control" type="text" name="fone" ng-model="vm.newPerson.fone" >
+                      </div>
+                    </div>
+
+                    <div class="row form-group">
+                      <div class="col-lg-1 col-md-1 col-xs-12 col-sm-12">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                      </div>
+                      <div class="col-lg-1 col-md-1 col-xs-12 col-sm-12">
+                        <button type="button" class="btn btn-primary" ng-click="vm.voltar()">Voltar</button>
+                      </div>
+                    </div>
+
+                    <div row form-group>
+                      <div class="panel-body">
+
+                        <table st-table="listPerson" st-safe-src="vm.listPerson" class="table table-striped">
+                          <thead>
+                          <tr>
+                            <th>Nome</th>
+                            <th>Documento</th>
+                            <th>Telefone</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr ng-repeat="record in listPerson">
+                            <td>{{record.person.name}}</td>
+                            <td>{{record.person.document}}</td>
+                            <td>{{record.person.fone}}</td>
+                          </tr>
+                          </tbody>
+                          <tfoot>
+                          <tr>
+                            <td colspan="3">
+                              <div  st-pagination="" st-items-by-page="5" st-template="./template/pagination.html"></div>
+                            </td>
+                          </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div ng-hide="vm.isInserting" class="row form-group">
           <div class="col-lg-12 col-md-12 col-xl-12 col-sm-12">
             <div class="panel panel-primary">
               <div class="panel-heading bg-primary">
@@ -63,27 +125,29 @@
                 <form ng-submit="vm.addNewRecord()">
                   <div class="row form-group">
                     <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
-                      <label for="dataEntrada">Data/hora da entrada</label>
-                      <input id="idDataEntradaCheckin" class="form-control" type="text" name="dataEntrada" ng-model="vm.record.dataEntrada" date-picker
+                      <label for="idDataEntradaCheckin">Data/hora da entrada</label>
+                      <input id="idDataEntradaCheckin" class="form-control" type="text" name="idDataEntradaCheckin" ng-model="vm.record.entryDate" date-picker
                         date-format="'DD/MM/YYYY HH:mm'" ng-blur="vm.onChangeStartDate()">
                     </div>
                     <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
-                      <label for="dataEntrada">Data/hora da saída</label>
-                      <input type="text" id="idDataSaidaCheckin" class="form-control" ng-model="vm.record.dataSaida" date-picker date-format="'DD/MM/YYYY HH:mm'"
+                      <label for="idDataSaidaCheckin">Data/hora da saída</label>
+                      <input type="text" id="idDataSaidaCheckin" name="idDataSaidaCheckin" class="form-control" ng-model="vm.record.exitDate" date-picker date-format="'DD/MM/YYYY HH:mm'"
                         ng-blur="vm.onChangeEndDate()">
                     </div>
                   </div>
                   <div class="row form-group">
                     <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
                       <label>Pessoa</label>
-                      <input type="text" id="idNomePessoaCheckin" class="form-control" ng-model="vm.record.pessoa.nome">
+                      <select name="persons" id="persons" ng-model="vm.record.person" class="form-control">
+                        <option ng-repeat="option in vm.listPerson" ng-value="option.person">{{option.person.name}}</option>
+                      </select>
                     </div>
                     <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
                       <div class="form-group">
                         <label>&nbsp;</label>
                         <div>
                           <label class="checkbox-inline">
-                            <input type="checkbox" id="idAdicionalVeiculoCheckin" ng-model="vm.record.adicionalVeiculo"> Possui veículo
+                            <input type="checkbox" id="idAdicionalVeiculoCheckin" ng-model="vm.record.haveVehicle"> Possui veículo
                           </label>
                         </div>
                       </div>
@@ -129,8 +193,8 @@
                   </thead>
                   <tbody>
                     <tr ng-repeat="record in displayedCollection">
-                      <td>{{record.pessoa.nome}}</td>
-                      <td>{{record.pessoa.documento}}</td>
+                      <td>{{record.person.name}}</td>
+                      <td>{{record.person.document}}</td>
                       <td>{{vm.bills(record) | currency : ''}}</td>
                     </tr>
                   </tbody>
@@ -149,11 +213,6 @@
       </div>
     </div>
   </div>
-
-
-
-
-
 
   <!-- build:js scripts/vendor.js -->
   <!-- bower:js -->

@@ -7,19 +7,34 @@ myApp.controller('my-controller', function ($http, $timeout) {
     const vm = this;
     init();
 
+
     vm.addNew = () => {
-        vm.isInserting = true;
+        vm.isInserting = !vm.isInserting;
+        vm.newPerson = {
+          person: {
+            name:'',
+            document:'',
+            fone:''
+          }
+        };
+    };
+
+    vm.saveNewPerson = () => {
+      vm.listPerson.push(angular.copy(vm.newPerson));
+    };
+
+    vm.voltar = () => {
+      vm.isInserting = false;
     }
 
     vm.onChangeFilter = () => {
         vm.records = vm.checkIn.filter(record => {
-            return ((vm.filter.type == 2 && moment(record.dataSaida).isBefore(moment(), 'minute'))
-                || (vm.filter.type == 1 && moment(record.dataSaida).isSameOrAfter(moment(), 'minute')))
+            return ((vm.filter.type == 2 && moment(record.exitDate).isBefore(moment(), 'minute'))
+                || (vm.filter.type == 1 && moment(record.exitDate).isSameOrAfter(moment(), 'minute')))
         });
     }
 
     vm.addNewRecord = () => {
-        vm.record.pessoa.documento = Math.round(Math.random() * 1000000);
         vm.checkIn.push(angular.copy(vm.record));
         vm.record = {};
         vm.onChangeFilter();
@@ -28,16 +43,16 @@ myApp.controller('my-controller', function ($http, $timeout) {
     }
 
     vm.onChangeEndDate = () => {
-        if (moment(vm.record.dataEntrada).isAfter(moment(vm.record.dataSaida))) {
+        if (moment(vm.record.entryDate).isAfter(moment(vm.record.exitDate))) {
             showAlert('A data de saída não pode ser menor que a data de entrada.', 'alert-danger');
-            vm.record.dataSaida = null;
+            vm.record.exitDate = null;
         }
     }
 
     vm.onChangeStartDate = () => {
-        if (moment().isAfter(moment(vm.record.dataEntrada))) {
+        if (moment().isAfter(moment(vm.record.entryDate))) {
             showAlert('A data de entrada não pode ser menor que a data atual.', 'alert-danger');
-            vm.record.dataEntrada = null;
+            vm.record.entryDate = null;
         }
     }
 
@@ -56,23 +71,24 @@ myApp.controller('my-controller', function ($http, $timeout) {
         vm.checkIn = [];
         vm.isInserting = false;
         vm.prices = {};
+        vm.listPerson = [];
 
         initData();
     }
 
     vm.bills = record => {
-        const aux = moment(record.dataEntrada);
-        const endDateAsMoment = moment(record.dataSaida);
+        const aux = moment(record.entryDate);
+        const endDateAsMoment = moment(record.entryDate);
         let bills = 0;
         const sum = () => {
             if (![SUNDAY, SATURDAY].includes(aux.isoWeekday())) {
                 bills += vm.prices.daily;
-                if (record.adicionalVeiculo) {
+                if (record.haveVehicle) {
                     bills += vm.prices.car;
                 }
             } else {
                 bills += vm.prices.weekend;
-                if (record.adicionalVeiculo) {
+                if (record.haveVehicle) {
                     bills += vm.prices.car_weekend;
                 }
             }
@@ -92,12 +108,15 @@ myApp.controller('my-controller', function ($http, $timeout) {
     }
 
     function initData() {
-        $http.get('json/fake.json').then(rec => {
+        $http.get('json/mock.json').then(rec => {
             vm.checkIn = rec.data;
             vm.onChangeFilter();
         });
-        $http.get('json/values.json').then(rec => {
+        $http.get('json/prices.json').then(rec => {
             vm.prices = rec.data;
+        });
+        $http.get('json/persons.json').then(rec => {
+          vm.listPerson = rec.data;
         });
     }
 });
